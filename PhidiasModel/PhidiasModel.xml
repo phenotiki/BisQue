@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module name="PhidiasModel" type="runtime" >
+
+<!-- ***** Inputs ***** -->
+
+    <tag name="inputs">
+        <tag name="mex_url" type="system-input" />
+        <tag name="bisque_token" type="system-input" />
+      	<tag name="resource_url" type="resource">
+            <template>
+                <tag name="label" value="Select input image" />
+                <tag name="accepted_type" value="dataset" />
+            </template>	
+        </tag>
+        
+        <tag name="small_size_lower" value="100" type="number" >
+            <template>
+                <tag name="label" value="Small object size: lower bound" />
+                <tag name="allowDecimals" value="false" type="boolean" />
+                <tag name="showSlider" value="false" type="boolean" />
+                <tag name="description" value="Lower bound of the range of values" />
+            </template>             
+        </tag>
+        
+                <tag name="small_size_upper" value="300" type="number" >
+            <template>
+                <tag name="label" value="Small object size: upper bound" />
+                <tag name="allowDecimals" value="false" type="boolean" />
+                <tag name="showSlider" value="false" type="boolean" />
+                <tag name="description" value="Upper bound of the range of values" />
+            </template>             
+        </tag>
+        
+                <tag name="small_size_step" value="100" type="number" >
+            <template>
+                <tag name="label" value="Small object size: step" />
+                <tag name="allowDecimals" value="false" type="boolean" />
+                <tag name="showSlider" value="false" type="boolean" />
+                <tag name="description" value="Step value" />
+            </template>             
+        </tag>
+         
+        
+        <tag name="lambda_lower" value="0.4" type="number" >
+            <template>
+                <tag name="label" value="ACM lambda: lower bound" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="showSlider" value="false" type="boolean" />
+                <tag name="decimalPrecision" value="2" type="number" />
+                <tag name="description" value="Lower bound of the range of values" />
+            </template>             
+        </tag>
+        
+                <tag name="lambda_upper" value="0.6" type="number" >
+            <template>
+                <tag name="label" value="ACM lambda upper bound" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="showSlider" value="false" type="boolean" />
+                <tag name="decimalPrecision" value="2" type="number" />
+                <tag name="description" value="Upper bound of the range of values" />
+            </template>             
+        </tag>
+        
+                <tag name="lambda_step" value="0.1" type="number" >
+            <template>
+                <tag name="label" value="ACM lambda: step" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="showSlider" value="false" type="boolean" />
+                <tag name="decimalPrecision" value="2" type="number" />
+                <tag name="description" value="Step value" />
+            </template>             
+        </tag>
+        
+        <tag name="num_plants" value="24" type="number" >
+            <template>
+                <tag name="label" value="Number of plants" />
+                <tag name="description" value="Number of plants in each image." />
+            </template>             
+         </tag>
+        
+        <tag name="num_plants" value="19" type="number" >
+            <template>
+                <tag name="label" value="Number of plants" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="step" value="1" type="number" />
+                <tag name="description" value="Number of subjects in the scene" />
+            </template>             
+         </tag>
+        
+         <tag name="crop_x1" value="1" type="number" >
+            <template>
+                <tag name="label" value="Left crop" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="step" value="1" type="number" />
+                <tag name="description" value="Horizontal crop position (left)" />
+            </template>             
+         </tag>
+         
+         <tag name="crop_x2" value="1" type="number" >
+            <template>
+                <tag name="label" value="Right crop" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="step" value="1" type="number" />
+                <tag name="description" value="Horizontal crop position (right)" />
+            </template>             
+         </tag>
+         
+          <tag name="crop_y1" value="1" type="number" >
+            <template>
+                <tag name="label" value="Top crop" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="step" value="1" type="number" />
+                <tag name="description" value="Vertical crop position (top)" />
+            </template>             
+         </tag>
+         
+         <tag name="crop_y2" value="1" type="number" >
+            <template>
+                <tag name="label" value="Bottom crop" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="step" value="1" type="number" />
+                <tag name="description" value="Vertical crop position (bottom)" />
+            </template>             
+         </tag> 		          
+
+        <tag name="scale_factor" value="1" type="number" >
+            <template>
+                <tag name="label" value="Scale factor" />
+                <tag name="minValue" value="0" type="number" />
+                <tag name="maxValue" value="1" type="number" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="step" value="0.1" type="number" />
+                <tag name="showSlider" value="true" type="boolean" />
+                <tag name="stepSlider" value="0.1" type="number" />
+                <tag name="description" value="Down scale factor for plant localization" />
+            </template>             
+        </tag>
+        
+        <tag name="sigmaH" value="4" type="number" >
+            <template>
+                <tag name="label" value="Texture DoG sigma H" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="maxValue" value="10" type="number" />
+                <tag name="description" value="Texture descriptor: std. dev. of the Gaussian filter (H)" />
+            </template>             
+        </tag>
+
+        <tag name="sigmaL" value="1" type="number" >
+            <template>
+                <tag name="label" value="Texture DoG sigma L" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="maxValue" value="10" type="number" />
+                <tag name="description" value="Texture descriptor: std. dev. of the Gaussian filter (L)" />
+            </template>             
+        </tag>
+
+        <tag name="radius" value="3" type="number" >
+            <template>
+                <tag name="label" value="Texture radius" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="maxValue" value="10" type="number" />
+                <tag name="description" value="Texture descriptor: radius of the pillbox filter" />
+            </template>             
+        </tag>
+
+        <tag name="falloff" value="0.02" type="number" >
+            <template>
+                <tag name="label" value="Texture alpha" />
+                <tag name="minValue" value="0.00" type="number" />
+                <tag name="maxValue" value="1.00" type="number" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="decimalPrecision" value="2" type="number" />
+                <tag name="description" value="Texture descriptor: exponential decrease rate" />
+            </template>             
+        </tag>
+        
+        <tag name="gauss" value="2" type="number" >
+            <template>
+                <tag name="label" value="GMM components" />
+                <tag name="minValue" value="1" type="number" />
+                <tag name="allowDecimals" value="false" type="boolean" />
+                <tag name="description" value="Number of components in the GMM appearance model" />
+            </template>             
+         </tag>
+         
+        <tag name="sigma_P" value="1.5" type="number" >
+            <template>
+                <tag name="label" value="GMM prior sigma" />
+                <tag name="minValue" value="0.0" type="number" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="decimalPrecision" value="1" type="number" />
+                <tag name="step" value="0.1" type="number" />
+                <tag name="description" value="Std. dev. of Gaussian smoothing of the GMM appearance model" />
+            </template>             
+        </tag>
+         
+
+        <tag name="iter" value="80" type="number" >
+            <template>
+                <tag name="label" value="ACM max iterations" />
+                <tag name="minValue" value="10" type="number" />
+                <tag name="maxValue" value="150" type="number" />
+                <tag name="description" value="Number of iterations of the active contour model segmentation" />
+            </template>             
+        </tag>
+
+        <tag name="noMedian" value="false" type="combo" >
+            <template>
+                <tag name="label" value="ACM no median" />
+                <tag name="description" value="If true, the median is not used in the active contour model" />
+                <tag name="select" value="false" />
+                <tag name="select" value="true" />
+            </template>             
+        </tag>
+
+        <tag name="sigma" value="1.5" type="number" >
+            <template>
+                <tag name="label" value="ACM sigma" />
+                <tag name="minValue" value="0.0" type="number" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="decimalPrecision" value="1" type="number" />
+                <tag name="step" value="0.1" type="number" />
+                <tag name="description" value="Std. dev. of Gaussian smoothing in the active contour model" />
+            </template>             
+         </tag>
+
+        <tag name="lambda_out" value="0.01" type="number" >
+            <template>
+                <tag name="label" value="ACM lambda bg" />
+                <tag name="minValue" value="0.00" type="number" />
+                <tag name="maxValue" value="1.00" type="number" />
+                <tag name="allowDecimals" value="true" type="boolean" />
+                <tag name="decimalPrecision" value="2" type="number" />
+                <tag name="showSlider" value="true" type="boolean" />
+                <tag name="stepSlider" value="0.01" type="number" />
+                <tag name="description" value="Background weight in the prior term of the active contour formulation" />
+            </template>             
+         </tag>
+         
+                  
+    </tag>
+
+<!-- ***** Outputs ***** -->
+  
+    <tag name="outputs">   
+        
+         <tag name="results">
+             <template>
+                <tag name="label" value="Optimal Parameters" />
+                <tag name="export_xml"  value="false" type="boolean" />
+                <tag name="export_excel"  value="true" type="boolean" />
+                <tag name="export_csv"  value="true" type="boolean" />
+                <tag name="export_gdocs"  value="false" type="boolean" />
+                <tag name="preview_movie" value="false" type="boolean" />
+            </template>
+        </tag>
+		                                     
+    </tag>
+  
+    <tag name="execute_options">
+        <tag name="argument_style" value="position" />
+    </tag>
+
+    <tag name="module_options" >
+        <tag name="version" value="1.0" />
+    </tag>
+    
+    <tag name="interface">        
+        <tag name="css" type="file" value="webapp.css" />
+    </tag>
+
+    <tag name="display_options" >
+        <tag name="group" value="Test" />
+    </tag>
+    
+    <tag name="title" value=" PhidiasModel" /> 
+    <tag name="authors" value=" Fabiana Zollo, Massimo Minervini and Sotirios Tsaftaris " />
+    <tag name="help" type="file" value="public/help.html" />
+    <tag name="thumbnail" type="file" value="public/logoModel.jpg" />        
+
+
+</module>

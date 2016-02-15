@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<title>Help</title>
+</head>
+
+<body>  
+
+<h3>Description:</h3>
+
+<p>This module allows to run a grid search for finding the best set of parameters to be used as input for Phidias module. <br><br>
+</p>
+	
+<h3>License</h3>
+
+<p class="license">By using this free and open source software you agree to reference this work and its authors in any products produced using it, including but not limited to scientific papers, posters, technical reports, presentations, leaflets, etc.</p>
+
+	<h3>How to run the algorithm:</h3>
+	 <ul>
+	<h4>Select data for processing:</h4>
+	<ul>
+	 <li><b>Prepare Images for the Dataset:</b></li>
+	  <ul>
+	   <li> If your masks have been created by means of PhidiasAnnotate, you just have to select or create the dataset and execute the module. Otherwise, you should apply the following steps to let the algorithm work correctly:
+	    <ul>
+	     	<li>Upload your images and their corresponding masks on Bisque.</li>
+
+		<li>Open your mask in the Bisque browser. You may need to convert your masks by using the Bisque converter tool. Select "embedded" in the metadata section on the right. Check if "image_pixe_depht" is equal to 8: <br><br>
+			<img src="browser.png"  style="width:100%" /> 
+		</li>
+		<br>
+		<li> Otherwise, select "operations" in the upper menu, then click on "convert":<br><br>
+			<img src="convert.png"  style="width:100%" /> 
+		</li>
+		<li> Select "depth". Set "Format" to "8bit unsigned integer" and "Method" to "Data range". Click on convert.<br><br>
+			<img src="depth.png"  style="width:100%" /> 
+		</li>
+		<br>
+		<li>After the conversion, you can save the new mask to your local machine and then upload it again on Bisque.<br><br></li>
+	    </ul>
+	   </li>
+	  </ul>
+	  <li>Once checked the "image_pixel_depth", you have to add two different tags to your masks. Select "Annotations" in the metadata section on the right.</li>
+		<br>
+		<li> Click on the "add" button. Add a tag "Original Image" and set its value to the filename of the original image the mask refers to. Add another tag "Type" and set its value to "mask". At the end, you should obtain something like this:<br><br>
+			<img src="masktag.png"  style="width:100%" /> 
+		</li>
+		<li> Repeat previous steps for each mask in your dataset.<br><br></li>
+		<br>
+		<li>Similarly, add a tag "Type" and set its value to "image" for each image in your dataset.<br><br></li>
+	  </ul>
+	<br>
+	<li><b>Dataset Creation:</b></li>
+	<li> You can now create the dataset  by selecting the images you want to use. Please be sure to have a mask for each image in your dataset. If you have already created your dataset, you just need to select it among the ones available.</li>
+	<li><b>Parameters:</b></li>
+	<ul>
+		<li>In this section you can setup all the parameters necessary to run the pipeline. The grid search is performed on three different parameters: "small_size", "lambda" and "enable_appearance_model" (being the latter a boolean, its values are automatically set by the grid search algorithm.) A full description of the segmentation method is provided in <a href="http://dx.doi.org/10.1016/j.ecoinf.2013.07.004"  style="color: OrangeRed"> "Minervini, M., et al., Image-based plant phenotyping with incremental learning and active contours, Ecological Informatics (2013)"</a>.</li>
+	</ul>
+	<br>
+	<li><b>Run Algorithm:</b></li>
+	<ul>
+		<li>Click on the "Run" button to execute the grid search.</li>
+	</ul>
+	<br>
+	<li><b>Results:</b></li>
+	<ul>
+		<li>In this section you can visualize the results. You can now use the best set of parameters as input for Phidias module.</li>
+	</ul>
+
+</body>
+</html>
