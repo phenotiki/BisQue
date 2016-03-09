@@ -64,15 +64,16 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
     file = image.info.filename;
     [~, imageName, ~] = fileparts(file);
     
-    host = 'http://fabiana-macbookpro:8080';
-    user = 'Mex';
-    pass = access_token;
+    %host = 'http://fabiana-macbookpro:8080';
+    %user = 'Mex';
+    %pass = access_token;
     
     t = TimeStamp;
     
     maskName = [imageName, '_mask',t ,'.tiff'];
     args = struct('filename', maskName);
-    imMask = bq.Image.store(M, args, host, user, pass);
+    %imMask = bq.Image.store(M, args, host, user, pass);
+    imMask = session.storeImage(M, args);
     if ~isempty(imMask),
         imMask.addTag('About', 'Segmentation mask created with PhidiasAnnotate');
         imMask.addTag('Original Image', file);
@@ -92,5 +93,4 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
     session.update('Saving mask..');
 
     session.finish();
-    
 end
