@@ -2,7 +2,7 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
 
     session = bq.Session(mex_url, access_token);
     
-    session.update('Fetching image..');
+    session.update('Fetching image...');
     
     image = session.fetch(image_url);
     I = image.fetch();
@@ -14,7 +14,7 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
     
     coord = zeros(length(polygones), 2);
     
-    session.update('Finding polygones..');
+    session.update('Finding polygons...');
     
     N = size(polygones, 1);
     
@@ -73,6 +73,7 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
     maskName = [imageName, '_mask',t ,'.tiff'];
     args = struct('filename', maskName);
     %imMask = bq.Image.store(M, args, host, user, pass);
+    session.update('Saving image mask...');
     imMask = session.storeImage(M, args);
     if ~isempty(imMask),
         imMask.addTag('About', 'Segmentation mask created with PhidiasAnnotate');
@@ -90,7 +91,7 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
     summary.addTag(sprintf('Filename'), maskName);
     summary.addTag(sprintf('Original Image'), file);
 
-    session.update('Saving mask..');
+    session.update('Saving mask...');
 
     session.finish();
 end
