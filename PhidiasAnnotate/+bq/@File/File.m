@@ -69,16 +69,26 @@ classdef File < bq.Node
     
     methods (Static)    
 
-        function node = store(filename, root_url, user, password)
-        % filename - filename
-        % node     - bq.Node object of the created resource            
+        function node = store(filename, root_url, user, password, resource)
+        % filename - path to the file
+        % root_url - bisque root url
+        % user
+        % password
+        % resource - optional, bq.Node, dom node or a string with resource description
+        %            here resource name may contain sub-path for storage on the system
+        % node     - bq.Node object of the created resource  
+        
             if ~exist('user', 'var') || isempty(user) || ~exist('password', 'var') || isempty(password),
                 error('bq.File.store:UserCredentialsInvalid', 'Store requires user name and password');
             end        
             
+            if ~exist('resource', 'var') || isempty(resource),
+                resource = ['<file name="', filename ,'" />'];   
+            end
+          
             url = bq.Url(root_url); 
             url.setPath('import/transfer');
-            [output, info] = bq.post_mpform(url.toString(), filename, user, password);
+            [output, info] = bq.post_mpform(url.toString(), filename, user, password, resource);
             output = char(output);
             if ~isempty(output) && info.status<300 && isempty(regexpi(output, '(<html)', 'tokenExtents')),
                 output = regexprep(output, '<resource type="uploaded">', '');

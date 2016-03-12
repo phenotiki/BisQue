@@ -31,7 +31,7 @@ classdef Url < matlab.mixin.Copyable
         function parse(self)
             pattern = [ '^(?<scheme>\w+)://'...
                         '(?<auth>\w+:\w+@)?'...
-                        '(?<authority>[-\w\.:]+)($|/)'...
+                        '(?<authority>[\w\.\-_:]+)($|/)'...
                         '(?<path>[-\w~!$+|.,=/]+)?'...
                         '(?<query>\?[\w!$+|.,-_~=&%@/]+)?'...
                         '(?<fragment>#[\w!$+|.,-_~=&%@/]+)?'];
@@ -121,6 +121,10 @@ classdef Url < matlab.mixin.Copyable
             r = self.purl.scheme;
         end        
         
+        function setScheme(self, scheme)
+            self.purl.scheme = scheme;
+        end   
+        
         % credentials
 
         function r = hasCredentials(self)
@@ -171,9 +175,9 @@ classdef Url < matlab.mixin.Copyable
             end
             if ~isempty(self.purl.query),
                 self.purl.query{end+1, 1} = field;
-                self.purl.query{end, 2} = value;
+                self.purl.query{end, 2} = urlencode(value);
             else
-                self.purl.query = {field, value};
+                self.purl.query = {field, urlencode(value)};
             end
         end           
         

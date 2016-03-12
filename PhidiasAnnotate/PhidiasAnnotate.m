@@ -71,16 +71,21 @@ function PhidiasAnnotate(mex_url, access_token, image_url)
     t = TimeStamp;
     
     maskName = [imageName, '_mask',t ,'.tiff'];
-    args = struct('filename', maskName);
+    %args = struct('filename', maskName);
     %imMask = bq.Image.store(M, args, host, user, pass);
+    resource = bq.Factory.new ('image', maskName)
+    resource.addTag('About', 'Segmentation mask created with PhidiasAnnotate');
+    resource.addTag('Original Image', file);
+    resource.addTag('Type', 'mask');
+
     session.update('Saving image mask...');
-    imMask = session.storeImage(M, args);
-    if ~isempty(imMask),
-        imMask.addTag('About', 'Segmentation mask created with PhidiasAnnotate');
-        imMask.addTag('Original Image', file);
-        imMask.addTag('Type', 'mask');
-        imMask.save();
-    end
+    imMask = session.storeImage(M, args, resource);
+    %if ~isempty(imMask),
+    %    imMask.addTag('About', 'Segmentation mask created with PhidiasAnnotate');
+    %    imMask.addTag('Original Image', file);
+    %    imMask.addTag('Type', 'mask');
+    %    imMask.save();
+    %end
        
     mask_url = imMask.getAttribute('uri');
     

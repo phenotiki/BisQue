@@ -22,7 +22,7 @@
 %       0.1 - 2011-06-27 First implementation
 %
 
-function info = iminfo(url, user, password)
+function [info, meta] = iminfo(url, user, password)
 
     %% parse the url
     purl = bq.Url(url);
@@ -55,7 +55,8 @@ function info = iminfo(url, user, password)
         doc_meta = bq.get_xml( [info.pixles_url '?meta'], user, password );
     else
         doc_meta = bq.get_xml( [info.pixles_url '?meta'] );    
-    end  
+    end
+    meta = [];
     if ~isempty(doc_meta),
         template = '//tag[@name=''%s'']';
         tags = { 'filename',    'str'; 
@@ -72,6 +73,7 @@ function info = iminfo(url, user, password)
                  'pixel_resolution_t', 'double';
                };
         info = bq.parsetags(doc_meta, tags, template, info);
+        meta = bq.Factory.fetch(doc_meta);
     end
     
     %% parse image resource tags overwriting some tag values

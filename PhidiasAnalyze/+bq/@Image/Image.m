@@ -19,6 +19,7 @@ classdef Image < bq.File
     properties
         info = [];
         pixels_url = [];
+        meta = [];
     end % properties
     
     methods
@@ -44,13 +45,62 @@ classdef Image < bq.File
             
             uri = self.getAttribute('uri');   
             if ~isempty(self.user) && ~isempty(self.password),
-                self.info = bq.iminfo(uri, self.user, self.password);
+                [self.info, M] = bq.iminfo(uri, self.user, self.password);
             else
-                self.info = bq.iminfo(uri);                
+                [self.info, M] = bq.iminfo(uri);                
             end
-            self.pixels_url = bq.Url(self.info.pixles_url);            
+            self.meta = M;
+            self.pixels_url = bq.Url(self.info.pixles_url);  
         end % init   
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % image_meta - metadata override for mutli-file images
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % sets image metadata override needed to correct embedded metadata
+        % problems or set proper metadata for multi-file images
+        % nz - number of z slices, 1 for none
+        % nt - number of time points, 1 for none
+        % nc - number of channels, set empty if channels are not stored 
+        %      as separate files
+        % res - vector with pixel resolution in order: xyzt
+        % cnames - cell array with channel names
+        function set_image_meta(self, nz, nt, nc, res, cnames)
+            image_meta = self.findNode('tag[@name="image_meta" and @type="image_meta"]');
+            if isempty(image_meta),
+                image_meta = self.addTag('image_meta', 'image_meta', 'image_meta');
+            end
+            image_meta.addTag('storage', 'multi_file_series');
+            image_meta.addTag('dimensions', 'XYCZT');
+
+            image_meta.addTag('image_num_z', nz, 'number');
+            image_meta.addTag('image_num_t', nt, 'number');
+            if exist('nc', 'var') && ~isempty(nc),
+                image_meta.addTag('image_num_c', nc, 'number');
+            end
+            
+            if exist('res', 'var') && ~isempty(res),
+                image_meta.addTag('pixel_resolution_x', res(1), 'number');
+                image_meta.addTag('pixel_resolution_y', res(2), 'number');
+                image_meta.addTag('pixel_resolution_unit_x', 'microns');
+                image_meta.addTag('pixel_resolution_unit_y', 'microns');
+                if length(res)>2
+                    image_meta.addTag('pixel_resolution_z', res(3), 'number');
+                    image_meta.addTag('pixel_resolution_unit_z', 'microns');
+                end
+                if length(res)>3
+                    image_meta.addTag('pixel_resolution_unit_t', 'seconds');
+                    
+                end                
+            end
+            
+            if exist('cnames', 'var') && ~isempty(cnames),
+                for i=1:length(cnames),
+                    image_meta.addTag(sprintf('channel_%d_name', i), cnames{i});
+                end
+            end
+        end % set_image_meta          
+       
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Pixels
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,7 +178,7 @@ classdef Image < bq.File
         % args.dim - c z t (as bim.write_ome_tiff requires)
         % args.res - x y z t (as bim.write_ome_tiff requires)
         % node  - bq.Node object of the created resource
-        function node = store(image, args, root_url, user, password)
+        function node = store(image, args, root_url, user, password, resource)
             if ~exist('user', 'var') || isempty(user) || ~exist('password', 'var') || isempty(password),
                 error('bq.Image.store:UserCredentialsInvalid', 'Store requires user name and password');
             end        
@@ -136,17 +186,28 @@ classdef Image < bq.File
             % if an image was given, store it as OME-TIFF and then upload
             if ~ischar(image),
                 if ~exist('args', 'var') || isempty(args),
-                    error('bq.Image.store:ImageArgsRequired', 'You must describe the image matrix');
+                    error('bq.Image.store: ImageArgsRequired', 'You must describe the image matrix');
                 end                  
                 
                 if ~isfield(args, 'dim'), args.dim = []; end
-                if ~isfield(args, 'res'), args.res = []; end                
-                filename = [tempdir args.filename];
+                if ~isfield(args, 'res'), args.res = []; end  
+                
+                s = strsplit(args.filename, '/');
+                filename = s{1, size(s, 2)};
+                filename = [tempdir filename];
                 bim.write_ome_tiff( image, filename, args.dim, args.res);
-            else
-                filename = image;                
+                if ~exist('resource', 'var') || isempty(resource),
+                    resource = ['<image name="', args.filename ,'" />'];
+                end
+            elseif ~exist('resource', 'var') || isempty(resource),
+                filename = image;
+                if ~exist('args', 'var') || isempty(args),
+                    resource = [];
+                else
+                    resource = ['<image name="', args.filename ,'" />']; 
+                end        
             end            
-            node = bq.File.store(filename, root_url, user, password); 
+            node = bq.File.store(filename, root_url, user, password, resource); 
         end % store          
     end % static methods    
     

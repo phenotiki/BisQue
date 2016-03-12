@@ -1,19 +1,18 @@
-% [output, info] = bq.connect(method, url, location, input, user, password)
+% [output, info] = post_mpform(url, input, user, password, resource)
 %
-% Lowest level communication function that can do HTTP requests
+% Lowest level communication function that can do HTTP multi-part form posts
 %
 % INPUT:
-%   method   - HTTP method: GET/POST/PUT/DELETE
-%   url      - url to fetch, may contain authentication which will be
-%               stripped and sent in the HTTP header:
-%               * Basic Auth - http://user:pass@host/path
-%               * Bisque Mex - http://Mex:IIII@host/path
-%   location - optional: file path to where to store fetched bytes, 
-%                give [] if no file should be written but user/pass is req
+%   url      - url to post to, may contain authentication which will be
+%              stripped and sent in the HTTP header:
+%              * Basic Auth - http://user:pass@host/path
+%              * Bisque Mex - http://Mex:IIII@host/path
 %   input    - optional: stream to send to the server
 %                give [] if no file should be written but user/pass is req
 %   user     - optional: string with user name
 %   password - optional: string with user password
+%   resource - optional: bq.Node, dom node or a string containing bisque 
+%              xml resource describing the input
 %
 % OUTPUT:
 %    output - either byte vector or a file name if location was given 
@@ -41,7 +40,7 @@
 %   0.1 - 2011-06-27 First implementation
 %
 
-function [output, info] = post_mpform(url, input, user, password)
+function [output, info] = post_mpform(url, input, user, password, resource)
     if ~exist('url', 'var') error(message('BQ.post_mpform:RequiresUrl')); end
     if ~exist('input', 'var') error(message('BQ.post_mpform:RequiresInput')); end
     
@@ -139,12 +138,23 @@ function [output, info] = post_mpform(url, input, user, password)
         file_length = length(input);
     end      
     
-    
     initial = [eol];
-%     initial = [initial, '--', boundary, eol];
-%     initial = [initial, 'Content-Disposition: form-data; name="file_tags"', eol];
-%     initial = [initial, eol];
-%     initial = [initial, '<resource type="file" name="', filename,'" uri="', filename,'" />', eol];    
+    if exist('resource', 'var') && ~isempty(resource),
+        if isa(resource, 'bq.Node'),
+            resource = resource.toString();
+        elseif ~ischar(resource),
+            resource = bq.xml2str(resource);
+        end          
+        initial = [initial, '--', boundary, eol];
+        initial = [initial, 'Content-Disposition: form-data; name="file_resource"', eol];
+        initial = [initial, eol];
+        initial = [initial, resource, eol];
+    else
+        initial = [initial, '--', boundary, eol];
+        initial = [initial, 'Content-Disposition: form-data; name="file_resource"', eol];
+        initial = [initial, eol];
+        initial = [initial, '<resource name="', filename,'" />', eol];
+    end
     
     initial = [initial, '--', boundary, eol];
     initial = [initial, 'Content-Disposition: form-data; name="file"; filename="', filename,'"', eol];

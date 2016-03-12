@@ -53,30 +53,45 @@ classdef Node < matlab.mixin.Copyable
             end            
         end % constructor
         
-        function save(self, filename, user, password)
+        function error = save(self, filename, user, password)
         % stores the document, default: is if the filename is not given
         % posts the document back to the Bisque server
         % if the filename is given then stores the doc as an XML file  
         % if filename is a URL, stores document to that URL
             if exist('user', 'var'), self.user = user; end
-            if exist('password', 'var'), self.password = password; end        
+            if exist('password', 'var'), self.password = password; end
+            error = [];
         
             if exist('filename', 'var') && ischar(filename) && ...
                (strncmpi(filename, 'http://', 7)==1 || strncmpi(filename, 'https://', 8)==1),
                 if ~isempty(self.user) && ~isempty(self.password),
-                    bq.post(filename, self.element, self.user, self.password);
+                    [output, info] = bq.post(filename, self.element, self.user, self.password);
                 else
-                    bq.post(filename, self.element);                    
+                    [output, info] = bq.post(filename, self.element);                    
                 end
+                
             elseif exist('filename', 'var') && ischar(filename),
                 %xmlwrite(filename, self.element);         
                 fileID = fopen(filename, 'w');
                 fwrite(fileID, self.toString());
                 fclose(fileID);
+                return;
             else
                 url = self.getAttribute('uri');
-                bq.post(url, self.element, self.user, self.password);
-            end            
+                [output, info] = bq.post(url, self.element, self.user, self.password);
+            end  
+
+            output = char(output);
+            if ~isempty(output) && info.status<300 && isempty(regexpi(output, '(<html)', 'tokenExtents')),
+                doc = bq.str2xml(output);
+                node = bq.Factory.fetch(doc, [], self.user, self.password);
+                if isempty(node),
+                    error('bq.Node.save: Could not be stored');
+                end
+                self.setAttribute('uri', node.getAttribute('uri'));
+            else
+                error = info.error;
+            end
         end % save          
         
         function remove(self, localonly)
@@ -115,10 +130,82 @@ classdef Node < matlab.mixin.Copyable
             stream = java.io.StringWriter;
             transformer.transform(DOMSource(newdoc), StreamResult(stream));
             str = char(stream.toString);
-        end % toString          
+        end % toString
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Access attributes
+        % Sharing
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        function changed = share(self, user, mode)
+        % user - has to be an exact match of either:
+        %     user name
+        %     user email
+        %     user url
+        % mode - 
+        %     read: allow only read access (default)
+        %     edit: allow read and write access
+        %     ~: empty (none value) remove share for that user 
+            
+            changed = [];
+            uri = self.getAttribute('uri');
+        
+            % find user
+            if length(user)>8 && ...
+               (strcmpi(user(1:7), 'http://') || strcmpi(user(1:8), 'https://')),
+                user_res = user;
+            else
+                url = bq.Url(uri);
+                bisque_root = url.getRoot();
+                user_query = ['"' user '": or "' user '"'];
+                user_res = bq.Factory.find(bisque_root, 'user', user_query, 'short', 'true', self.user, self.password);
+            end
+            
+            if isempty(user_res),
+                error('bq.Node.share: User not found');
+            end
+            user_uri = user_res.getAttribute('uri');
+            
+            % fetch shares
+            shares = bq.Factory.fetch([uri '/auth'], [], self.user, self.password);
+            if isempty(shares),
+                error('bq.Node.share: Auth record could not be fetched');
+            end            
+            
+            % delete share
+            if ~exist('mode', 'var') || isempty(mode) || strcmpi(mode, 'delete') == 1,
+                sh = shares.findNode(['auth[@user="' user_uri '"]']);
+                if isempty(sh),
+                    return;
+                end
+                shares.element.removeChild(sh.element);
+            elseif strcmpi(mode, 'read') == 1 || strcmpi(mode, 'edit') == 1,
+                sh = shares.findNode(['auth[@user="' user_uri '"]']);
+                if isempty(sh),
+                    % append share
+                    sh = shares.doc.createElement('auth');
+                    sh.setAttribute('user', user_uri);
+                    sh.setAttribute('action', mode);
+                    shares.element.appendChild(sh);                     
+                else
+                    % modify share
+                    m = sh.getAttribute('action');
+                    if strcmp(mode, m) == 1,
+                        return;
+                    end
+                    sh.setAttribute('action', mode); 
+                end            
+            end
+            % save chaged shares
+            %shares.save([], self.user, self.password);
+            [output, info] = bq.put([uri '/auth'], shares, self.user, self.password);
+            if info.status>=300,
+                error('bq.Node.share: Auth record could not be saved');
+            end      
+            changed = 1;
+        end % share          
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Access attributes - generic
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         function value = getAttribute(self, name)
@@ -131,7 +218,22 @@ classdef Node < matlab.mixin.Copyable
         
         function v = hasAttribute(self, name)
             v = self.element.hasAttribute(name);
-        end % getAttribute             
+        end % getAttribute 
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Access attributes - specific
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        function v = isType(self, type)
+            v = strcmp(type, self.getType());
+        end % isType
+        
+        function type = getType(self)
+            type = char(self.element.getTagName());
+            if strcmpi(type, 'resource') == 1,
+                type = self.getAttribute('resource_type');
+            end
+        end % getType        
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Access values
@@ -171,7 +273,7 @@ classdef Node < matlab.mixin.Copyable
                 values{1} = char(self.element.getAttribute('value'));
             end
             
-            % find all <value> sub nodes            
+            % find all <value> sub nodes
             import javax.xml.xpath.*;
             factory = XPathFactory.newInstance;
             xpath = factory.newXPath;    
@@ -191,9 +293,31 @@ classdef Node < matlab.mixin.Copyable
             end
         end % getValues            
         
-        function value = setValues(self, values)
-            % not yet implemented
-            %value = char(self.element.getAttribute(name));
+        function setValues(self, values)
+            
+            % find and delete all <value> sub nodes
+            import javax.xml.xpath.*;
+            factory = XPathFactory.newInstance;
+            xpath = factory.newXPath;    
+            xnodes = xpath.evaluate('value', self.element, XPathConstants.NODESET);
+            if ~isempty(xnodes) && xnodes.getLength()>0,
+                for i=xnodes.getLength():-1:1,
+                    n = xnodes.item(i-1);
+                    self.element.removeChild(n);
+                end
+            end
+
+            % set type
+            if isnumeric(values{1}),
+                self.element.setAttribute('type', 'number'); 
+            end
+            
+            % write new values
+            for i=1:length(values),
+                v = self.doc.createElement('value');
+                v.setTextContent(num2str(values{i}));
+                self.element.appendChild(v);    
+            end            
         end % setValues                  
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -431,7 +555,7 @@ classdef Node < matlab.mixin.Copyable
                 gob.setVertices(vertices);
             end
         end % addGobject 
-
        
     end% methods
+        
 end% classdef

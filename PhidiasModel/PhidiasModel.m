@@ -234,16 +234,24 @@ function PhidiasModel(mex_url, access_token, resource_url, varargin)
     
     save(filename, 'Gmm', 'gs_small_size', 'gs_lambda', 'gs_eam');
     
-    host = 'http://fabiana-macbookpro:8080';
-    user = 'Mex';
-    pass = access_token;
+    %%host = 'http://fabiana-macbookpro:8080';
+    %%user = 'Mex';
+    %%pass = access_token;
     
-    file = bq.File.store(filename, host, user, pass);
-    if ~isempty(file),
-	    file.setAttribute('permission', 'published');
-	    file.addTag('about', 'File upload from PhidiasModel');
-	    file.save();
-    end
+    %%file = bq.File.store(filename, host, user, pass);
+       mex_id = strsplit(mex_url, '/'); mex_id = mex_id{end};
+       dt = datestr(now,'yyyymmddTHHMMss');
+
+    resource = bq.Factory.new ('file', ['ModuleExections/Phidias/' mex_id  '/' dt '.mat' ] );
+    resource.setAttribute('permission', 'published');
+    resource.addTag('about', 'File upload from PhidiasModel');
+    file = session.storeFile (filename, resource);
+
+    %if ~isempty(file),
+    %    file.
+    %    file.addTag('about', 'File upload from PhidiasModel');
+    %    file.save();
+    %end
     
     file_url = file.getAttribute('uri');
     
