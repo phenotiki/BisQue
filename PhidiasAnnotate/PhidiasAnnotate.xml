@@ -69,8 +69,8 @@
         <tag name="group" value="Test" />
     </tag>
     
-    <tag name="title" value=" PhidiasAnnotate" /> 
-    <tag name="authors" value=" Fabiana Zollo, Massimo Minervini and Sotirios Tsaftaris " />
+    <tag name="title" value="PhidiasAnnotate" /> 
+    <tag name="authors" value="Fabiana Zollo, Massimo Minervini and Sotirios Tsaftaris" />
     <tag name="help" type="file" value="public/help.html" />
     <tag name="thumbnail" type="file" value="public/logo.png" />        
 
