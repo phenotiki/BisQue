@@ -175,30 +175,38 @@ classdef Url < matlab.mixin.Copyable
             end
             if ~isempty(self.purl.query),
                 self.purl.query{end+1, 1} = field;
-                if ~isempty(value),
-                    self.purl.query{end, 2} = urlencode(value);
-                else
-                    self.purl.query{end, 2} = value;
-                end                
+                self.purl.query{end, 2} = bq.Url.urlencode(value);
             else
-                if ~isempty(value),
-                    self.purl.query = {field, urlencode(value)};
-                else
-                    self.purl.query = {field, value};                
-                end
+                self.purl.query = {field, bq.Url.urlencode(value)};
             end
         end           
         
-        function popQuery(self)
+        function q = popQuery(self)
+            q = [];
             if ~isempty(self.purl.query),
+                q = self.purl.query(end, :);
                 self.purl.query(end, :) = [];
             end
-        end             
+        end
         
-        function removeQuery(self, field)
+        function q = findQuery(self, field)
+            q = [];
             if ~isempty(self.purl.query),
                 for i=1:size(self.purl.query, 1),
                     if strcmpi(self.purl.query{i,1}, field),
+                        q = self.purl.query(i, :);
+                        break;
+                    end
+                end                
+            end
+        end         
+        
+        function q = removeQuery(self, field)
+            q = [];
+            if ~isempty(self.purl.query),
+                for i=1:size(self.purl.query, 1),
+                    if strcmpi(self.purl.query{i,1}, field),
+                        q = self.purl.query(i, :);
                         self.purl.query(i, :) = [];
                         break;
                     end
@@ -207,4 +215,25 @@ classdef Url < matlab.mixin.Copyable
         end          
         
     end% methods
+    
+    methods (Static)    
+
+        function urlOut = urlencode(urlIn)
+        %URLENCODE Replace special characters with escape characters URLs need 
+            urlOut = urlIn;
+            if ~isempty(urlIn),
+                urlOut = char(java.net.URLEncoder.encode(urlIn,'UTF-8'));
+            end
+        end % urlencode
+        
+        function urlOut = urldecode(urlIn)
+        %URLDECODE Replace URL-escaped strings with their original characters
+            urlOut = urlIn;
+            if ~isempty(urlIn),
+                urlOut = char(java.net.URLDecoder.decode(urlIn,'UTF-8'));
+            end
+        end % urldecode
+        
+    end % static methods    
+    
 end% classdef
