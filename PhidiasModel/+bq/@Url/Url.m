@@ -175,9 +175,17 @@ classdef Url < matlab.mixin.Copyable
             end
             if ~isempty(self.purl.query),
                 self.purl.query{end+1, 1} = field;
-                self.purl.query{end, 2} = urlencode(value);
+                if ~isempty(value),
+                    self.purl.query{end, 2} = urlencode(value);
+                else
+                    self.purl.query{end, 2} = value;
+                end                
             else
-                self.purl.query = {field, urlencode(value)};
+                if ~isempty(value),
+                    self.purl.query = {field, urlencode(value)};
+                else
+                    self.purl.query = {field, value};                
+                end
             end
         end           
         
