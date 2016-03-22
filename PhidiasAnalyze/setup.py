@@ -3,7 +3,7 @@ import sys
 from bq.setup.module_setup import matlab_setup, read_config, docker_setup
 
 def setup(params, *args, **kw):
-    matlab_setup('Phidias.m', params=params)
+    matlab_setup(['Phidias.m', '-a', 'phenotype_descriptors'], params=params)
     docker_setup('phidiasanalyze', 'Phidias', 'matlab_runtime', params=params)
     
 if __name__ =="__main__":
