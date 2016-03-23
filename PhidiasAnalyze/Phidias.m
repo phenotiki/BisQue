@@ -5,7 +5,7 @@ function Phidias(mex_url, access_token, resource_url, varargin)
     try
         session = bq.Session(mex_url, access_token);
 
-        session.update('Initializing..'); 
+        session.update('Initializing...'); 
 
         % Load images from Bisque server
         image = session.fetch(resource_url);
@@ -52,7 +52,7 @@ function Phidias(mex_url, access_token, resource_url, varargin)
         % Execute Pipeline
         for i = 1 : number_t
             fprintf(['***** Image: ', int2str(i), ' *****']);    
-            session.update('Analysing..');   
+            session.update('Analysing...');   
             I = image.slice([],i).fetch(); 
 
             [plant_centroids, cluster_center, Gmm, previous, labelled_mask_fullres_ls] = pipeline(I, session, plant_centroids, cluster_center, isFirst, display, Gmm, previous, lambda, small_size, enable_appearance_model);
@@ -61,7 +61,7 @@ function Phidias(mex_url, access_token, resource_url, varargin)
             isFirst = false;              
         end
 
-        session.update('Analysing - 100%'); 
+        session.update('Analysis done'); 
 
         %% Create Output Parameters
 
@@ -178,7 +178,7 @@ function Phidias(mex_url, access_token, resource_url, varargin)
             end
         end    
 
-        session.update('Saving results..');
+        session.update('Saving results...');
 
         session.finish();
     catch err
