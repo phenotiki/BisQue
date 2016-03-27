@@ -18,7 +18,7 @@
                 <tag name="label" value="Number of plants" />
                 <tag name="minValue" value="1" type="number" />
                 <tag name="step" value="1" type="number" />
-                <tag name="description" value="Number of subjects in the scene" />
+                <tag name="description" value="Number of plants in the scene" />
             </template>             
          </tag>
         
