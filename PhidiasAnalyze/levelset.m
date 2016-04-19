@@ -1,4 +1,18 @@
 function mask = levelset(I, F, Iter, Sigma, u, display, noMedian, lambda, lambda_out,  P)
+%LEVELSET Level-set based active contour segmentation.
+%
+%   Author(s): Massimo Minervini
+%   Contact:   massimo.minervini@imtlucca.it
+%   Version:   1.0
+%   Date:      --
+%
+%   Copyright (C) 2016 Massimo Minervini
+%
+%   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+%   BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+%   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 % Load system options
 %config;

@@ -1,7 +1,19 @@
 function F = extract_features(I, session)
-% EXTRACT_FEATURES Extract features of interest (a*, b* and texture) 
-% from image I. The RGB to L*a*b* colour space conversion is performed 
-% to eliminate issues of non uniform illumination
+%EXTRACT_FEATURES Extract features of interest (a*, b* and texture) from image I. The RGB to L*a*b*
+%   colour space conversion is performed to eliminate issues of non uniform illumination.
+%
+%   Author(s): Massimo Minervini, Fabiana Zollo
+%   Contact:   massimo.minervini@imtlucca.it
+%   Version:   1.0
+%   Date:      --
+%
+%   Copyright (C) 2016 Massimo Minervini
+%
+%   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+%   BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+%   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 sigmaH = session.mex.findValue('//tag[@name="inputs"]/tag[@name="sigmaH"]');
 sigmaL = session.mex.findValue('//tag[@name="inputs"]/tag[@name="sigmaL"]');

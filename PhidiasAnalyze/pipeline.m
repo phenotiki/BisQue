@@ -1,4 +1,18 @@
 function [plant_centroids, cluster_center, Gmm, previous, mask_final] = pipeline(image, session, plant_centroids_previous, cluster_center_previous, isFirst, display, Gmm, previous, lambda, small_size, enable_appearance_model)
+%PIPELINE Plant image analysis pipeline.
+%
+%   Author(s): Massimo Minervini, Fabiana Zollo
+%   Contact:   massimo.minervini@imtlucca.it
+%   Version:   1.0
+%   Date:      --
+%
+%   Copyright (C) 2016 Massimo Minervini
+%
+%   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+%   BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+%   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 plant_num = session.mex.findValue('//tag[@name="inputs"]/tag[@name="num_plants"]');
 scale_factor = session.mex.findValue('//tag[@name="inputs"]/tag[@name="scale_factor"]');
